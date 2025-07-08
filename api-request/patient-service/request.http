@@ -23,3 +23,6 @@ Content-Type: application/json
   "address": "İstanbul, Türkiye",
   "dateOfBirth": "1990-05-15"
 }
+
+### Delete Patient
+DELETE http://localhost:4000/patients/223e4567-e89b-12d3-a456-426614174013

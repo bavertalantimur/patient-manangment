@@ -50,6 +50,13 @@ public class PatientService {
 
     }
 
+    public void deletePatient(UUID id) {
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new PatientNotFoundException("Patient not found with id: " + id));
+        patientRepository.delete(patient);
+        // deletById de kullanılabilir.
+    }
+
 
 
 }
