@@ -115,6 +115,12 @@
                             <artifactId>mapstruct-processor</artifactId>
                             <version>1.5.1.Final</version>
                         </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.38</version> <!-- BURAYI EKLE -->
+                        </path>
+
 
 
 

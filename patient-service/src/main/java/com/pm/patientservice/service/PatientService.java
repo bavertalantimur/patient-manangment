@@ -2,14 +2,16 @@ package com.pm.patientservice.service;
 
 import com.pm.patientservice.dto.PatientRequestDto;
 import com.pm.patientservice.dto.PatientResponseDto;
+import com.pm.patientservice.exception.EmailAlreadyExistsException;
+import com.pm.patientservice.exception.PatientNotFoundException;
 import com.pm.patientservice.mapper.PatientMapper;
 import com.pm.patientservice.model.Patient;
 import com.pm.patientservice.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -26,16 +28,28 @@ public class PatientService {
                 .toList();
     }
 
-    public PatientResponseDto createPatient(PatientRequestDto patientRequestDtod) {
-        // 1. DTO'dan entity'ye dönüşüm
-        Patient patient = patientMapper.toEntity(patientRequestDtod);
+    public PatientResponseDto createPatient(PatientRequestDto patientRequestDto) {
 
-        // 2. Entity'yi kaydet (id vs. atanacak)
-        patient = patientRepository.save(patient);
-
-        // 3. Kaydedilen entity'yi DTO'ya dönüştür ve döndür
+        if (patientRepository.existsByEmail(patientRequestDto.getEmail())) {
+            throw new EmailAlreadyExistsException("A patient with this email " +"already exists "+ patientRequestDto.getEmail());
+        }
+        Patient patient =    patientRepository.save(patientMapper.toEntity(patientRequestDto));
         return patientMapper.toDto(patient);
     }
+
+    public PatientResponseDto updatePatient(UUID id,PatientRequestDto patientRequestDto) {
+        Patient existingPatient = patientRepository.findById(id)
+                .orElseThrow(() -> new PatientNotFoundException("Patient not found with id: " + id));
+
+        if (patientRepository.existsByEmailAndIdNot(patientRequestDto.getEmail(), id)) {
+            throw new EmailAlreadyExistsException("A patient with this email already exists: " + patientRequestDto.getEmail());
+        }
+
+        patientMapper.updatePatientFromDto(patientRequestDto, existingPatient);
+        return patientMapper.toDto(patientRepository.save(existingPatient));
+
+    }
+
 
 
 }
